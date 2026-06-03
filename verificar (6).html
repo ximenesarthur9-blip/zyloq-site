@@ -1,0 +1,318 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Verificação de Certificado — ZYLOQ</title>
+<meta name="description" content="Verificação de autenticidade do Certificado de Destinação Oncológica Zyloq.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;700;800&family=DM+Mono:wght@300;400&display=swap" rel="stylesheet">
+<style>
+:root{--black:#0A0A0A;--white:#FFFFFF;--blue:#006AFC;--green:#16a34a;--red:#dc2626;}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+html{scroll-behavior:smooth;}
+body{font-family:'DM Sans',sans-serif;font-size:15px;line-height:1.7;overflow-x:hidden;background:#f4f6fa;padding-top:72px;}
+nav{position:fixed;top:0;left:0;right:0;z-index:50;height:72px;padding:0 48px;display:flex;align-items:center;justify-content:space-between;background:rgba(10,10,10,.97);backdrop-filter:blur(12px);border-bottom:1px solid rgba(255,255,255,.08);}
+.nav-logo{font-family:'DM Sans',sans-serif;font-weight:800;font-size:22px;color:#fff;text-decoration:none;letter-spacing:.02em;}
+.nav-logo span{color:var(--blue);}
+.nav-links{display:flex;gap:40px;list-style:none;}
+.nav-links a{color:rgba(255,255,255,.6);text-decoration:none;font-size:13px;letter-spacing:.08em;text-transform:uppercase;transition:color .2s;}
+.nav-links a:hover{color:#fff;}
+.nav-cta{background:var(--blue);color:#fff;padding:10px 24px;font-family:'DM Sans',sans-serif;font-size:13px;font-weight:700;letter-spacing:.05em;text-transform:uppercase;cursor:pointer;text-decoration:none;transition:opacity .2s;}
+.nav-cta:hover{opacity:.85;}
+
+/* LOADING STATE */
+.loading-wrap{min-height:calc(100vh - 72px);display:flex;flex-direction:column;align-items:center;justify-content:center;padding:48px;}
+.loading-spinner{width:48px;height:48px;border:3px solid rgba(0,106,252,.2);border-top-color:var(--blue);border-radius:50%;animation:spin .8s linear infinite;margin-bottom:20px;}
+@keyframes spin{to{transform:rotate(360deg);}}
+.loading-text{font-size:14px;color:#666;font-family:'DM Mono',monospace;letter-spacing:.05em;}
+
+/* ERROR STATE */
+.error-wrap{min-height:calc(100vh - 72px);display:none;flex-direction:column;align-items:center;justify-content:center;padding:48px;text-align:center;}
+.error-icon{font-size:48px;margin-bottom:20px;}
+.error-title{font-family:'DM Sans',sans-serif;font-weight:800;font-size:28px;color:var(--black);margin-bottom:12px;}
+.error-sub{font-size:15px;color:#666;max-width:400px;line-height:1.7;}
+.error-code{font-family:'DM Mono',monospace;font-size:12px;color:#aaa;margin-top:16px;background:#f0f0f0;padding:8px 16px;display:inline-block;}
+
+/* VALID STATE */
+.cert-wrap{display:none;max-width:760px;margin:0 auto;padding:48px 24px 80px;}
+
+/* BADGE */
+.verify-badge{display:flex;align-items:center;gap:12px;padding:16px 24px;margin-bottom:32px;font-size:14px;font-weight:600;}
+.verify-badge.valid{background:#dcfce7;border:1.5px solid #86efac;color:#15803d;}
+.verify-badge.invalid{background:#fee2e2;border:1.5px solid #fca5a5;color:var(--red);}
+.badge-icon{font-size:20px;}
+.badge-text{}
+.badge-sub{font-size:12px;font-weight:400;opacity:.7;margin-top:1px;}
+
+/* CERT CARD */
+.cert-card{background:var(--black);border:1px solid rgba(255,255,255,.1);overflow:hidden;margin-bottom:24px;}
+.cert-card-header{background:#006AFC;padding:24px 32px;display:flex;justify-content:space-between;align-items:flex-start;}
+.cert-card-header-left{}
+.cert-brand{font-family:'DM Sans',sans-serif;font-weight:800;font-size:20px;color:#fff;letter-spacing:.02em;}
+.cert-brand span{color:rgba(255,255,255,.7);}
+.cert-header-sub{font-size:11px;color:rgba(255,255,255,.7);margin-top:3px;letter-spacing:.05em;font-family:'DM Mono',monospace;}
+.cert-num{font-family:'DM Mono',monospace;font-size:11px;color:rgba(255,255,255,.8);text-align:right;}
+.cert-num-label{font-size:10px;color:rgba(255,255,255,.5);margin-bottom:3px;letter-spacing:.05em;}
+.cert-body{padding:32px;}
+.cert-section-title{font-size:10px;letter-spacing:.2em;text-transform:uppercase;color:rgba(255,255,255,.3);font-family:'DM Mono',monospace;margin-bottom:16px;margin-top:28px;padding-bottom:8px;border-bottom:1px solid rgba(255,255,255,.06);}
+.cert-section-title:first-child{margin-top:0;}
+.cert-row{display:flex;justify-content:space-between;align-items:center;padding:9px 0;border-bottom:1px solid rgba(255,255,255,.04);font-size:13px;}
+.cert-row:last-child{border-bottom:none;}
+.cert-label{color:rgba(255,255,255,.4);font-family:'DM Mono',monospace;font-size:12px;}
+.cert-value{color:#fff;font-weight:500;text-align:right;font-family:'DM Mono',monospace;font-size:12px;}
+.cert-value.blue{color:var(--blue);}
+.cert-value.red{color:#f87171;font-weight:700;}
+.cert-value.green{color:#4ade80;}
+.cert-footer-bar{background:rgba(255,255,255,.04);border-top:1px solid rgba(255,255,255,.08);padding:16px 32px;font-size:10px;color:rgba(255,255,255,.25);letter-spacing:.06em;font-family:'DM Mono',monospace;text-align:center;}
+
+/* HASH BLOCK */
+.hash-block{background:#111;border:1px solid rgba(255,255,255,.08);padding:24px;margin-bottom:24px;}
+.hash-block-title{font-size:11px;letter-spacing:.15em;text-transform:uppercase;color:rgba(255,255,255,.4);font-family:'DM Mono',monospace;margin-bottom:12px;}
+.hash-value{font-family:'DM Mono',monospace;font-size:11px;color:var(--blue);word-break:break-all;line-height:1.8;background:rgba(0,106,252,.06);padding:12px 16px;border:1px solid rgba(0,106,252,.15);}
+.hash-note{font-size:12px;color:rgba(255,255,255,.35);margin-top:12px;line-height:1.6;}
+
+/* BACK LINK */
+.back-link{display:inline-flex;align-items:center;gap:8px;font-size:13px;color:#666;text-decoration:none;margin-bottom:28px;transition:color .2s;}
+.back-link:hover{color:var(--blue);}
+
+/* INFO BOX */
+.info-box{background:#fff;border:1px solid #e0e0e0;padding:24px;margin-bottom:24px;}
+.info-box-title{font-size:12px;font-weight:700;color:var(--black);letter-spacing:.05em;text-transform:uppercase;margin-bottom:8px;}
+.info-box-body{font-size:13px;color:#555;line-height:1.7;}
+.info-box-body a{color:var(--blue);text-decoration:none;}
+
+footer{background:var(--black);padding:28px 48px;border-top:1px solid rgba(255,255,255,.1);display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:12px;}
+.footer-text{font-size:12px;color:rgba(255,255,255,.4);}
+.footer-tagline{font-size:12px;color:rgba(255,255,255,.4);letter-spacing:.15em;text-transform:uppercase;}
+
+@media(max-width:768px){
+  nav{padding:0 20px;}
+  .nav-links{display:none;}
+  .cert-wrap{padding:32px 16px 60px;}
+  .cert-card-header{flex-direction:column;gap:12px;}
+  .cert-num{text-align:left;}
+  .cert-body{padding:20px;}
+  footer{padding:20px 20px;flex-direction:column;text-align:center;}
+}
+</style>
+</head>
+<body>
+
+<nav>
+  <a href="/index.html"><img src="/logo-white-cropped.png" alt="Zyloq" style="height:36px;"></a>
+  <ul class="nav-links">
+    <li><a href="index.html#problema">Problema</a></li>
+    <li><a href="como-funciona.html">Como funciona</a></li>
+    <li><a href="index.html#para-quem">Para quem</a></li>
+  </ul>
+  <a href="https://wa.me/5581993040072" target="_blank" class="nav-cta">Falar com a Zyloq</a>
+</nav>
+
+<!-- LOADING -->
+<div class="loading-wrap" id="state-loading">
+  <div class="loading-spinner"></div>
+  <div class="loading-text">verificando certificado...</div>
+</div>
+
+<!-- ERROR -->
+<div class="error-wrap" id="state-error">
+  <div class="error-icon">⚠</div>
+  <h1 class="error-title">Certificado não encontrado</h1>
+  <p class="error-sub">O identificador informado não corresponde a nenhum certificado no sistema Zyloq. O documento pode ter sido invalidado ou o QR code está incorreto.</p>
+  <div class="error-code" id="error-id"></div>
+  <br><br>
+  <a href="/index.html" style="color:var(--blue);font-size:14px;text-decoration:none;">← Voltar para a Zyloq</a>
+</div>
+
+<!-- VALID CERTIFICATE -->
+<div class="cert-wrap" id="state-valid">
+  <a href="/index.html" class="back-link">← Zyloq</a>
+
+  <div class="verify-badge valid" id="verify-badge">
+    <span class="badge-icon">✓</span>
+    <div>
+      <div class="badge-text">Certificado autêntico e válido</div>
+      <div class="badge-sub">Documento verificado no banco de dados Zyloq em tempo real</div>
+    </div>
+  </div>
+
+  <div class="cert-card">
+    <div class="cert-card-header">
+      <div class="cert-card-header-left">
+        <div class="cert-brand">ZYLO<span>Q</span></div>
+        <div class="cert-header-sub">CERTIFICADO DE DESTINAÇÃO ONCOLÓGICA · RDC ANVISA Nº 430/2020</div>
+      </div>
+      <div class="cert-num">
+        <div class="cert-num-label">CERTIFICADO Nº</div>
+        <div id="cert-numero">—</div>
+      </div>
+    </div>
+    <div class="cert-body">
+
+      <div class="cert-section-title">Dados do medicamento</div>
+      <div class="cert-row"><span class="cert-label">Medicamento</span><span class="cert-value" id="cert-medicamento">—</span></div>
+      <div class="cert-row"><span class="cert-label">Princípio ativo</span><span class="cert-value" id="cert-principio">—</span></div>
+      <div class="cert-row"><span class="cert-label">Lote</span><span class="cert-value" id="cert-lote">—</span></div>
+      <div class="cert-row"><span class="cert-label">Validade</span><span class="cert-value" id="cert-validade">—</span></div>
+      <div class="cert-row"><span class="cert-label">Quantidade</span><span class="cert-value" id="cert-quantidade">—</span></div>
+      <div class="cert-row"><span class="cert-label">Valor desperdiçado</span><span class="cert-value red" id="cert-valor">—</span></div>
+      <div class="cert-row"><span class="cert-label">Motivo da devolução</span><span class="cert-value" id="cert-motivo">—</span></div>
+
+      <div class="cert-section-title">Origem</div>
+      <div class="cert-row"><span class="cert-label">Hospital / Unidade</span><span class="cert-value" id="cert-hospital">—</span></div>
+      <div class="cert-row"><span class="cert-label">Responsável pelo registro</span><span class="cert-value" id="cert-responsavel">—</span></div>
+      <div class="cert-row"><span class="cert-label">Data do registro</span><span class="cert-value" id="cert-data-registro">—</span></div>
+
+      <div class="cert-section-title">Destinação final</div>
+      <div class="cert-row"><span class="cert-label">Status</span><span class="cert-value green" id="cert-status">—</span></div>
+      <div class="cert-row"><span class="cert-label">Empresa coletora</span><span class="cert-value" id="cert-empresa">—</span></div>
+      <div class="cert-row"><span class="cert-label">MTR SINIR</span><span class="cert-value green" id="cert-mtr">—</span></div>
+      <div class="cert-row"><span class="cert-label">Data da coleta</span><span class="cert-value" id="cert-data-coleta">—</span></div>
+      <div class="cert-row"><span class="cert-label">Responsável entrega</span><span class="cert-value" id="cert-resp-entrega">—</span></div>
+      <div class="cert-row"><span class="cert-label">Conformidade</span><span class="cert-value blue">RDC ANVISA nº 430/2020 + Lei 12.305/2010</span></div>
+
+    </div>
+    <div class="cert-footer-bar">
+      ZYLOQ · zyloq.com.br · Documento gerado automaticamente · RDC ANVISA nº 430/2020 · Verificado em <span id="cert-verificado-em">—</span>
+    </div>
+  </div>
+
+  <div class="hash-block" id="hash-block" style="display:none;">
+    <div class="hash-block-title">Hash de integridade SHA-256</div>
+    <div class="hash-value" id="cert-hash">—</div>
+    <div class="hash-note">Este hash foi gerado no momento da emissão do certificado. Qualquer alteração no documento — um caractere, um espaço — produz um hash completamente diferente, comprovando que o documento não foi adulterado.</div>
+  </div>
+
+  <div class="info-box">
+    <div class="info-box-title">Sobre este certificado</div>
+    <div class="info-box-body">Este documento foi emitido automaticamente pela plataforma Zyloq em conformidade com a <strong>RDC ANVISA nº 430/2020</strong>, que estabelece a responsabilidade compartilhada na logística reversa de medicamentos no Brasil. Para dúvidas ou contestações, entre em contato: <a href="mailto:contato@zyloq.com.br">contato@zyloq.com.br</a></div>
+  </div>
+</div>
+
+<footer>
+  <div class="footer-text">contato@zyloq.com.br · +55 81 99304-0072 · Recife, PE · CNPJ 67.148.559/0001-34</div>
+  <div class="footer-tagline">Zero loss. Full cycle.</div>
+</footer>
+
+<script>
+const SUPA_URL = 'https://ykxjosonuidgjsevpljx.supabase.co';
+const SUPA_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InlreGpvc29udWlkZ2pzZXZwbGp4Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzk3NDQwNDcsImV4cCI6MjA5NTMyMDA0N30.kqOV4ZguC99ZW6Aa0c0m9ofuW7pWFV8tVSNK7CEha3Q';
+
+const MOTIVO_MAP = {
+  'obito': 'Óbito', 'suspensao_clinica': 'Suspensão clínica',
+  'sobra_frasco': 'Sobra de frasco', 'alta_hospitalar': 'Alta hospitalar',
+  'absenteismo': 'Absenteísmo', 'vencimento': 'Vencimento'
+};
+
+const STATUS_MAP = {
+  'incinerado': 'Incineração certificada ✓',
+  'devolvido_fabricante': 'Devolvido ao fabricante ✓',
+  'coprocessado': 'Coprocessamento ✓',
+  'aterro_licenciado': 'Aterro licenciado ✓',
+  'registrado': 'Aguardando destinação'
+};
+
+function show(id) {
+  ['state-loading','state-error','state-valid'].forEach(s => {
+    const el = document.getElementById(s);
+    el.style.display = s === id ? (s === 'state-error' ? 'flex' : 'block') : 'none';
+  });
+}
+
+function getUUID() {
+  // Try path: /verificar/UUID
+  const path = window.location.pathname;
+  const parts = path.split('/').filter(Boolean);
+  const vIdx = parts.findIndex(p => p === 'verificar' || p === 'verificar.html');
+  if (vIdx !== -1 && parts[vIdx + 1]) return parts[vIdx + 1];
+
+  // Try query param ?id=UUID
+  const params = new URLSearchParams(window.location.search);
+  if (params.get('id')) return params.get('id');
+
+  // Try hash #UUID
+  if (window.location.hash) return window.location.hash.slice(1);
+
+  return null;
+}
+
+function fmtDate(d) {
+  if (!d) return '—';
+  try { return new Date(d).toLocaleDateString('pt-BR', { day: '2-digit', month: '2-digit', year: 'numeric' }); }
+  catch { return d; }
+}
+
+function fmtBRL(v) {
+  if (!v) return '—';
+  return 'R$ ' + Number(v).toLocaleString('pt-BR', { minimumFractionDigits: 2 });
+}
+
+function set(id, val) {
+  const el = document.getElementById(id);
+  if (el) el.textContent = val || '—';
+}
+
+async function verify() {
+  const uuid = getUUID();
+
+  if (!uuid) {
+    document.getElementById('error-id').textContent = 'ID não informado na URL';
+    show('state-error');
+    return;
+  }
+
+  try {
+    const url = `${SUPA_URL}/rest/v1/registros?id=eq.${encodeURIComponent(uuid)}&select=id,lote,validade,quantidade,valor_desperdicado,motivo,status,registrado_por,registrado_em,hash_sha256,empresa_coletora,numero_mtr,data_coleta,responsavel_entrega,hospitais(nome),medicamentos(nome,principio_ativo)`;
+    const res = await fetch(url, {
+      headers: { 'apikey': SUPA_KEY, 'Authorization': 'Bearer ' + SUPA_KEY }
+    });
+
+    if (!res.ok) throw new Error('HTTP ' + res.status);
+    const data = await res.json();
+
+    if (!data || data.length === 0) {
+      document.getElementById('error-id').textContent = 'ID: ' + uuid;
+      show('state-error');
+      return;
+    }
+
+    const reg = Array.isArray(data) ? data[0] : data;
+
+    // Populate
+    const certId = 'ZYLOQ-' + uuid.substring(0, 8).toUpperCase();
+    set('cert-numero', certId);
+    set('cert-medicamento', reg.medicamentos?.nome || '—');
+    set('cert-principio', reg.medicamentos?.principio_ativo || '—');
+    set('cert-lote', reg.lote || '—');
+    set('cert-validade', fmtDate(reg.validade));
+    set('cert-quantidade', (reg.quantidade || '—') + (reg.quantidade ? ' unidade(s)' : ''));
+    set('cert-valor', fmtBRL(reg.valor_desperdicado));
+    set('cert-motivo', MOTIVO_MAP[reg.motivo] || reg.motivo || '—');
+    set('cert-hospital', reg.hospitais?.nome || '—');
+    set('cert-responsavel', reg.registrado_por || '—');
+    set('cert-data-registro', fmtDate(reg.registrado_em));
+    set('cert-status', STATUS_MAP[reg.status] || reg.status || '—');
+    set('cert-empresa', reg.empresa_coletora || '—');
+    set('cert-mtr', reg.numero_mtr || 'Não vinculado');
+    set('cert-data-coleta', fmtDate(reg.data_coleta));
+    set('cert-resp-entrega', reg.responsavel_entrega || '—');
+    set('cert-verificado-em', new Date().toLocaleString('pt-BR', { timeZone: 'America/Sao_Paulo' }));
+
+    if (reg.hash_sha256) {
+      set('cert-hash', reg.hash_sha256);
+      document.getElementById('hash-block').style.display = 'block';
+    }
+
+    show('state-valid');
+
+  } catch (err) {
+    document.getElementById('error-id').textContent = 'Erro: ' + err.message;
+    show('state-error');
+  }
+}
+
+verify();
+</script>
+</body>
+</html>
