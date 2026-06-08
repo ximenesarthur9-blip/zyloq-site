@@ -1,0 +1,428 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Zyloq — Administração</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;700;800&family=DM+Mono:wght@300;400&display=swap" rel="stylesheet">
+<style>
+:root{--black:#0A0A0A;--navy:#0A1628;--blue:#006AFC;--white:#FFFFFF;--gray:#F4F6FA;--gray-mid:#E5E7EB;--muted:#6B7280;--green:#16A34A;--green-light:#DCFCE7;--red:#DC2626;--red-light:#FEE2E2;--amber:#D97706;}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+body{font-family:'DM Sans',sans-serif;font-size:14px;line-height:1.6;background:var(--gray);color:var(--black);min-height:100vh;}
+
+/* LOGIN */
+.login-wrap{min-height:100vh;display:flex;align-items:center;justify-content:center;background:var(--navy);padding:24px;}
+.login-card{background:var(--white);width:100%;max-width:420px;padding:48px;}
+.login-logo{font-family:'DM Sans',sans-serif;font-weight:800;font-size:28px;color:var(--navy);margin-bottom:4px;}
+.login-logo span{color:var(--blue);}
+.login-sub{font-size:12px;color:var(--muted);margin-bottom:32px;font-family:'DM Mono',monospace;letter-spacing:.05em;}
+.login-label{font-size:11px;letter-spacing:.12em;text-transform:uppercase;color:var(--muted);font-family:'DM Mono',monospace;margin-bottom:8px;display:block;}
+.login-input{width:100%;padding:12px 16px;border:1px solid var(--gray-mid);font-family:'DM Mono',monospace;font-size:14px;color:var(--black);background:var(--gray);outline:none;transition:border .2s;box-sizing:border-box;}
+.login-input:focus{border-color:var(--blue);background:var(--white);}
+.login-btn{width:100%;background:var(--blue);color:#fff;padding:14px;font-family:'DM Sans',sans-serif;font-size:14px;font-weight:700;letter-spacing:.05em;text-transform:uppercase;border:none;cursor:pointer;margin-top:16px;transition:opacity .2s;}
+.login-btn:hover{opacity:.85;}
+.login-error{color:var(--red);font-size:12px;margin-top:8px;font-family:'DM Mono',monospace;display:none;}
+
+/* NAV */
+nav{background:var(--navy);padding:0 32px;height:64px;display:none;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:50;border-bottom:1px solid rgba(255,255,255,.08);}
+.nav-logo img{height:30px;}
+.nav-right{display:flex;align-items:center;gap:16px;}
+.nav-badge{font-size:11px;font-family:'DM Mono',monospace;color:var(--amber);background:rgba(217,119,6,.12);padding:4px 12px;border:1px solid rgba(217,119,6,.3);letter-spacing:.05em;}
+.nav-logout{background:none;border:1px solid rgba(255,255,255,.2);color:rgba(255,255,255,.5);padding:6px 14px;font-family:'DM Mono',monospace;font-size:11px;letter-spacing:.08em;cursor:pointer;transition:all .2s;}
+.nav-logout:hover{border-color:rgba(255,255,255,.5);color:#fff;}
+
+/* LAYOUT */
+.container{max-width:1000px;margin:0 auto;padding:32px 24px;display:none;}
+.page-title{font-size:22px;font-weight:800;color:var(--navy);margin-bottom:4px;}
+.page-sub{font-size:13px;color:var(--muted);margin-bottom:32px;}
+
+/* TABS */
+.tabs{display:flex;gap:0;border-bottom:2px solid var(--gray-mid);margin-bottom:32px;}
+.tab{padding:12px 24px;font-size:13px;font-weight:600;color:var(--muted);cursor:pointer;border-bottom:2px solid transparent;margin-bottom:-2px;transition:all .2s;}
+.tab.active{color:var(--blue);border-bottom-color:var(--blue);}
+.tab:hover:not(.active){color:var(--navy);}
+.tab-content{display:none;}
+.tab-content.active{display:block;}
+
+/* CARDS */
+.card{background:var(--white);border:1px solid var(--gray-mid);padding:28px;margin-bottom:20px;}
+.card-title{font-size:15px;font-weight:700;color:var(--navy);margin-bottom:4px;}
+.card-sub{font-size:12px;color:var(--muted);margin-bottom:24px;}
+
+/* FORM */
+.form-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px;}
+.form-group{display:flex;flex-direction:column;gap:6px;}
+.form-group.full{grid-column:1/-1;}
+.form-label{font-size:11px;letter-spacing:.12em;text-transform:uppercase;color:var(--muted);font-family:'DM Mono',monospace;}
+.form-input{padding:11px 14px;border:1px solid var(--gray-mid);font-family:'DM Sans',sans-serif;font-size:14px;color:var(--black);background:var(--white);outline:none;transition:border .2s;}
+.form-input:focus{border-color:var(--blue);}
+.form-select{padding:11px 14px;border:1px solid var(--gray-mid);font-family:'DM Sans',sans-serif;font-size:14px;color:var(--black);background:var(--white);outline:none;transition:border .2s;appearance:none;}
+.form-select:focus{border-color:var(--blue);}
+.btn-primary{background:var(--blue);color:#fff;padding:12px 28px;font-family:'DM Sans',sans-serif;font-size:13px;font-weight:700;letter-spacing:.05em;text-transform:uppercase;border:none;cursor:pointer;transition:opacity .2s;margin-top:8px;}
+.btn-primary:hover{opacity:.85;}
+.btn-danger{background:var(--red);color:#fff;padding:6px 14px;font-family:'DM Sans',sans-serif;font-size:12px;font-weight:600;border:none;cursor:pointer;transition:opacity .2s;}
+.btn-danger:hover{opacity:.85;}
+
+/* ALERT */
+.alert{padding:12px 16px;font-size:13px;font-family:'DM Mono',monospace;margin-bottom:16px;display:none;}
+.alert.success{background:var(--green-light);color:var(--green);border-left:4px solid var(--green);}
+.alert.error{background:var(--red-light);color:var(--red);border-left:4px solid var(--red);}
+
+/* TABLE */
+.data-table{width:100%;border-collapse:collapse;font-size:13px;}
+.data-table th{padding:10px 14px;text-align:left;font-size:10px;letter-spacing:.12em;text-transform:uppercase;color:var(--muted);background:var(--gray);border-bottom:1px solid var(--gray-mid);font-weight:600;}
+.data-table td{padding:12px 14px;border-bottom:1px solid rgba(229,231,235,.5);color:var(--black);}
+.data-table tr:last-child td{border-bottom:none;}
+.data-table tr:hover td{background:rgba(0,106,252,.02);}
+.mono{font-family:'DM Mono',monospace;font-size:11px;color:var(--muted);}
+.badge-green{background:var(--green-light);color:var(--green);padding:2px 8px;font-size:11px;font-weight:600;}
+.badge-blue{background:#EBF1FD;color:var(--blue);padding:2px 8px;font-size:11px;font-weight:600;}
+
+/* LOADING */
+.loading-row td{text-align:center;color:var(--muted);padding:32px;font-family:'DM Mono',monospace;}
+</style>
+</head>
+<body>
+
+<!-- LOGIN -->
+<div class="login-wrap" id="login-screen">
+  <div class="login-card">
+    <div class="login-logo">ZYLO<span>Q</span></div>
+    <div class="login-sub">PAINEL DE ADMINISTRAÇÃO</div>
+    <label class="login-label">Senha de administrador</label>
+    <input type="password" class="login-input" id="login-input" placeholder="••••••••" onkeydown="if(event.key==='Enter')doLogin()">
+    <div class="login-error" id="login-error">Senha incorreta.</div>
+    <button class="login-btn" onclick="doLogin()">Entrar</button>
+  </div>
+</div>
+
+<!-- NAV -->
+<nav id="main-nav" style="display:none;">
+  <a href="index.html"><img src="logo-white-cropped.png" alt="Zyloq" style="height:30px;"></a>
+  <div class="nav-right">
+    <span class="nav-badge">ADMINISTRAÇÃO</span>
+    <button class="nav-logout" onclick="doLogout()">SAIR</button>
+  </div>
+</nav>
+
+<!-- MAIN -->
+<div class="container" id="main-content" style="display:none;">
+  <div class="page-title">Painel de Administração</div>
+  <div class="page-sub">Gerencie medicamentos e hospitais cadastrados na plataforma Zyloq.</div>
+
+  <div class="tabs">
+    <div class="tab active" onclick="switchTab('medicamentos')">Medicamentos</div>
+    <div class="tab" onclick="switchTab('hospitais')">Hospitais</div>
+  </div>
+
+  <!-- TAB MEDICAMENTOS -->
+  <div class="tab-content active" id="tab-medicamentos">
+    <div class="card">
+      <div class="card-title">Adicionar Medicamento</div>
+      <div class="card-sub">Novos medicamentos ficam disponíveis imediatamente nos formulários de registro.</div>
+      <div id="alert-med" class="alert"></div>
+      <div class="form-grid">
+        <div class="form-group">
+          <label class="form-label">Nome comercial</label>
+          <input type="text" class="form-input" id="med-nome" placeholder="Ex: Keytruda">
+        </div>
+        <div class="form-group">
+          <label class="form-label">Princípio ativo</label>
+          <input type="text" class="form-input" id="med-principio" placeholder="Ex: Pembrolizumabe">
+        </div>
+        <div class="form-group">
+          <label class="form-label">Valor unitário (R$)</label>
+          <input type="number" class="form-input" id="med-valor" placeholder="Ex: 45000">
+        </div>
+        <div class="form-group">
+          <label class="form-label">Fabricante</label>
+          <input type="text" class="form-input" id="med-fabricante" placeholder="Ex: MSD, Roche, Pfizer">
+        </div>
+        <div class="form-group">
+          <label class="form-label">Categoria</label>
+          <select class="form-select" id="med-categoria">
+            <option value="oncologico">Oncológico</option>
+            <option value="imunoncologia">Imunooncologia</option>
+            <option value="quimioterapia">Quimioterapia</option>
+            <option value="terapia_alvo">Terapia Alvo</option>
+            <option value="hormonal">Hormonal</option>
+            <option value="outro">Outro</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Unidade</label>
+          <select class="form-select" id="med-unidade">
+            <option value="frasco">Frasco</option>
+            <option value="cápsula">Cápsula</option>
+            <option value="comprimido">Comprimido</option>
+            <option value="ampola">Ampola</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Volume do frasco (mL)</label>
+          <input type="number" class="form-input" id="med-volume" placeholder="Ex: 100">
+        </div>
+        <div class="form-group">
+          <label class="form-label">Registro ANVISA</label>
+          <input type="text" class="form-input" id="med-anvisa" placeholder="Ex: 1234567890123">
+        </div>
+      </div>
+      <button class="btn-primary" onclick="addMedicamento()">Adicionar Medicamento</button>
+    </div>
+
+    <div class="card">
+      <div class="card-title">Medicamentos Cadastrados</div>
+      <div class="card-sub" id="med-count">Carregando...</div>
+      <table class="data-table">
+        <thead>
+          <tr>
+            <th>Nome comercial</th>
+            <th>Princípio ativo</th>
+            <th>Valor unitário</th>
+            <th>ID</th>
+          </tr>
+        </thead>
+        <tbody id="med-table">
+          <tr class="loading-row"><td colspan="4">Carregando medicamentos...</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- TAB HOSPITAIS -->
+  <div class="tab-content" id="tab-hospitais">
+    <div class="card">
+      <div class="card-title">Adicionar Hospital</div>
+      <div class="card-sub">Novos hospitais ficam disponíveis imediatamente nos formulários de registro.</div>
+      <div id="alert-hosp" class="alert"></div>
+      <div class="form-grid">
+        <div class="form-group">
+          <label class="form-label">Nome do hospital</label>
+          <input type="text" class="form-input" id="hosp-nome" placeholder="Ex: Hospital Real Português">
+        </div>
+        <div class="form-group">
+          <label class="form-label">Cidade</label>
+          <input type="text" class="form-input" id="hosp-cidade" placeholder="Ex: Recife">
+        </div>
+        <div class="form-group">
+          <label class="form-label">Estado</label>
+          <select class="form-select" id="hosp-estado">
+            <option value="PE">Pernambuco</option>
+            <option value="SP">São Paulo</option>
+            <option value="RJ">Rio de Janeiro</option>
+            <option value="MG">Minas Gerais</option>
+            <option value="BA">Bahia</option>
+            <option value="CE">Ceará</option>
+            <option value="outro">Outro</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Tipo</label>
+          <select class="form-select" id="hosp-tipo">
+            <option value="privado">Privado</option>
+            <option value="publico">Público</option>
+            <option value="filantrópico">Filantrópico</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label class="form-label">CNPJ</label>
+          <input type="text" class="form-input" id="hosp-cnpj" placeholder="00.000.000/0001-00">
+        </div>
+        <div class="form-group full">
+          <label class="form-label">Contato (email do responsável)</label>
+          <input type="email" class="form-input" id="hosp-contato" placeholder="farmacia@hospital.com.br">
+        </div>
+      </div>
+      <button class="btn-primary" onclick="addHospital()">Adicionar Hospital</button>
+    </div>
+
+    <div class="card">
+      <div class="card-title">Hospitais Cadastrados</div>
+      <div class="card-sub" id="hosp-count">Carregando...</div>
+      <table class="data-table">
+        <thead>
+          <tr>
+            <th>Nome</th>
+            <th>Cidade / Estado</th>
+            <th>Email</th>
+            <th>ID</th>
+          </tr>
+        </thead>
+        <tbody id="hosp-table">
+          <tr class="loading-row"><td colspan="4">Carregando hospitais...</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+<script>
+const SUPA_URL = 'https://ykxjosonuidgjsevpljx.supabase.co';
+const SUPA_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InlreGpvc29udWlkZ2pzZXZwbGp4Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzk3NDQwNDcsImV4cCI6MjA5NTMyMDA0N30.kqOV4ZguC99ZW6Aa0c0m9ofuW7pWFV8tVSNK7CEha3Q';
+const ADMIN_PASS = 'zyloqadmin2026';
+const headers = {
+  'apikey': SUPA_KEY,
+  'Authorization': 'Bearer ' + SUPA_KEY,
+  'Content-Type': 'application/json',
+  'Prefer': 'return=representation'
+};
+
+// AUTH
+function doLogin() {
+  const val = document.getElementById('login-input').value.trim();
+  if (val === ADMIN_PASS) {
+    sessionStorage.setItem('zyloq_admin', '1');
+    document.getElementById('login-screen').style.display = 'none';
+    document.getElementById('main-nav').style.display = 'flex';
+    document.getElementById('main-content').style.display = 'block';
+    loadAll();
+  } else {
+    document.getElementById('login-error').style.display = 'block';
+    document.getElementById('login-input').value = '';
+  }
+}
+
+function doLogout() {
+  sessionStorage.removeItem('zyloq_admin');
+  window.location.reload();
+}
+
+function checkAuth() {
+  if (sessionStorage.getItem('zyloq_admin') === '1') {
+    document.getElementById('login-screen').style.display = 'none';
+    document.getElementById('main-nav').style.display = 'flex';
+    document.getElementById('main-content').style.display = 'block';
+    loadAll();
+  }
+}
+
+// TABS
+function switchTab(tab) {
+  document.querySelectorAll('.tab').forEach((t, i) => t.classList.toggle('active', ['medicamentos','hospitais'][i] === tab));
+  document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+  document.getElementById('tab-' + tab).classList.add('active');
+}
+
+// ALERT
+function showAlert(id, msg, type) {
+  const el = document.getElementById(id);
+  el.textContent = msg;
+  el.className = 'alert ' + type;
+  el.style.display = 'block';
+  setTimeout(() => el.style.display = 'none', 4000);
+}
+
+// MEDICAMENTOS
+async function loadMedicamentos() {
+  const res = await fetch(`${SUPA_URL}/rest/v1/medicamentos?select=*&order=nome.asc`, { headers });
+  const data = await res.json();
+  const tbody = document.getElementById('med-table');
+  document.getElementById('med-count').textContent = data.length + ' medicamentos cadastrados';
+  if (!data.length) {
+    tbody.innerHTML = '<tr class="loading-row"><td colspan="4">Nenhum medicamento cadastrado.</td></tr>';
+    return;
+  }
+  tbody.innerHTML = data.map(m => `
+    <tr>
+      <td><strong>${m.nome || '—'}</strong></td>
+      <td>${m.principio_ativo || '—'}</td>
+      <td class="mono">R$ ${Number(m.valor_unitario || 0).toLocaleString('pt-BR')}</td>
+      <td class="mono">${m.id.substring(0,8).toUpperCase()}</td>
+    </tr>
+  `).join('');
+}
+
+async function addMedicamento() {
+  const nome = document.getElementById('med-nome').value.trim();
+  const principio = document.getElementById('med-principio').value.trim();
+  const valor = Number(document.getElementById('med-valor').value);
+  const fabricante = document.getElementById('med-fabricante').value.trim();
+  const categoria = document.getElementById('med-categoria').value;
+  const unidade = document.getElementById('med-unidade').value;
+
+  if (!nome || !principio || !valor) {
+    showAlert('alert-med', 'Preencha todos os campos obrigatórios.', 'error');
+    return;
+  }
+
+  const volume = document.getElementById('med-volume').value;
+  const anvisa = document.getElementById('med-anvisa').value.trim();
+  const res = await fetch(`${SUPA_URL}/rest/v1/medicamentos`, {
+    method: 'POST', headers,
+    body: JSON.stringify({ nome, principio_ativo: principio, valor_unitario: valor, fabricante, categoria, unidade, volume_frasco: volume ? Number(volume) : null, registro_anvisa: anvisa || null })
+  });
+
+  if (res.ok) {
+    showAlert('alert-med', `Medicamento "${nome}" cadastrado com sucesso.`, 'success');
+    document.getElementById('med-nome').value = '';
+    document.getElementById('med-principio').value = '';
+    document.getElementById('med-valor').value = '';
+    loadMedicamentos();
+  } else {
+    const err = await res.json();
+    showAlert('alert-med', 'Erro: ' + (err.message || 'Não foi possível cadastrar.'), 'error');
+  }
+}
+
+// HOSPITAIS
+async function loadHospitais() {
+  const res = await fetch(`${SUPA_URL}/rest/v1/hospitais?select=*&order=nome.asc`, { headers });
+  const data = await res.json();
+  const tbody = document.getElementById('hosp-table');
+  document.getElementById('hosp-count').textContent = data.length + ' hospitais cadastrados';
+  if (!data.length) {
+    tbody.innerHTML = '<tr class="loading-row"><td colspan="4">Nenhum hospital cadastrado.</td></tr>';
+    return;
+  }
+  tbody.innerHTML = data.map(h => `
+    <tr>
+      <td><strong>${h.nome || '—'}</strong></td>
+      <td>${h.cidade || '—'} / ${h.estado || '—'}</td>
+      <td class="mono">${h.contato || '—'}</td>
+      <td class="mono">${h.id.substring(0,8).toUpperCase()}</td>
+    </tr>
+  `).join('');
+}
+
+async function addHospital() {
+  const nome = document.getElementById('hosp-nome').value.trim();
+  const cidade = document.getElementById('hosp-cidade').value.trim();
+  const estado = document.getElementById('hosp-estado').value;
+  const tipo = document.getElementById('hosp-tipo').value;
+  const cnpj = document.getElementById('hosp-cnpj').value.trim();
+  const contato = document.getElementById('hosp-contato').value.trim();
+
+  if (!nome || !cidade) {
+    showAlert('alert-hosp', 'Preencha pelo menos o nome e a cidade.', 'error');
+    return;
+  }
+
+  const res = await fetch(`${SUPA_URL}/rest/v1/hospitais`, {
+    method: 'POST', headers,
+    body: JSON.stringify({ nome, cidade, estado, tipo, cnpj, contato })
+  });
+
+  if (res.ok) {
+    showAlert('alert-hosp', `Hospital "${nome}" cadastrado com sucesso.`, 'success');
+    document.getElementById('hosp-nome').value = '';
+    document.getElementById('hosp-cidade').value = '';
+    document.getElementById('hosp-cnpj').value = '';
+    document.getElementById('hosp-contato').value = '';
+    loadHospitais();
+  } else {
+    const err = await res.json();
+    showAlert('alert-hosp', 'Erro: ' + (err.message || 'Não foi possível cadastrar.'), 'error');
+  }
+}
+
+function loadAll() {
+  loadMedicamentos();
+  loadHospitais();
+}
+
+checkAuth();
+document.getElementById('login-input').addEventListener('keydown', e => { if(e.key==='Enter') doLogin(); });
+</script>
+</body>
+</html>
