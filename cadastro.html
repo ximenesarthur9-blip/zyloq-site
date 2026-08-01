@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="description" content="Solicite acesso à plataforma Zyloq — rastreabilidade e certificação de medicamentos oncológicos.">
+<title>Solicitar Acesso — ZYLOQ</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;700;800&family=DM+Mono:wght@300;400&display=swap" rel="stylesheet">
+<style>
+:root{--black:#0A0A0A;--white:#FFFFFF;--blue:#006AFC;}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+html{scroll-behavior:smooth;}
+body{font-family:'DM Sans',sans-serif;font-size:15px;line-height:1.7;overflow-x:hidden;padding-top:72px;background:var(--black);color:#fff;}
+nav{position:fixed;top:0;left:0;right:0;z-index:50;height:72px;padding:0 48px;display:flex;align-items:center;justify-content:space-between;background:rgba(10,10,10,.95);backdrop-filter:blur(12px);border-bottom:1px solid rgba(255,255,255,.08);}
+.nav-links{display:flex;gap:40px;list-style:none;}
+.nav-links a{color:rgba(255,255,255,.6);text-decoration:none;font-size:13px;letter-spacing:.08em;text-transform:uppercase;transition:color .2s;}
+.nav-links a:hover{color:#fff;}
+@media(max-width:768px){.nav-links{display:none;}}
+
+.wrap{min-height:calc(100vh - 72px);display:flex;flex-direction:column;justify-content:center;padding:80px 48px 100px;position:relative;overflow:hidden;}
+.glow{position:absolute;top:10%;right:-5%;width:500px;height:500px;background:radial-gradient(circle,rgba(0,106,252,.12) 0%,transparent 70%);pointer-events:none;}
+.container{max-width:620px;margin:0 auto;width:100%;position:relative;z-index:1;}
+.label{font-size:12px;letter-spacing:.25em;text-transform:uppercase;color:var(--blue);margin-bottom:20px;}
+.title{font-family:'DM Sans',sans-serif;font-weight:800;font-size:clamp(32px,4.5vw,48px);line-height:1.1;letter-spacing:-.01em;color:#fff;margin-bottom:16px;}
+.sub{color:rgba(255,255,255,.65);font-size:15px;line-height:1.8;margin-bottom:48px;max-width:520px;}
+
+form{display:flex;flex-direction:column;gap:20px;}
+.row{display:grid;grid-template-columns:1fr 1fr;gap:20px;}
+@media(max-width:640px){.row{grid-template-columns:1fr;}}
+label{display:block;font-size:11px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:rgba(255,255,255,.5);margin-bottom:8px;}
+input,select,textarea{width:100%;background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.14);color:#fff;padding:13px 16px;font-family:'DM Sans',sans-serif;font-size:14px;border-radius:2px;transition:border-color .2s;}
+input:focus,select:focus,textarea:focus{outline:none;border-color:var(--blue);}
+input::placeholder,textarea::placeholder{color:rgba(255,255,255,.3);}
+select{appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%23888' stroke-width='1.5' fill='none'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 16px center;}
+textarea{resize:vertical;min-height:90px;}
+
+.btn-submit{background:var(--blue);color:#fff;padding:16px 32px;font-family:'DM Sans',sans-serif;font-size:14px;font-weight:700;letter-spacing:.05em;text-transform:uppercase;border:none;cursor:pointer;transition:opacity .2s;margin-top:12px;}
+.btn-submit:hover{opacity:.85;}
+.btn-submit:disabled{opacity:.4;cursor:not-allowed;}
+
+.msg{padding:16px 20px;border-radius:2px;font-size:13px;display:none;margin-top:8px;}
+.msg.success{display:block;background:rgba(16,185,129,.1);border:1px solid rgba(16,185,129,.3);color:#6ee7b7;}
+.msg.error{display:block;background:rgba(244,63,94,.1);border:1px solid rgba(244,63,94,.3);color:#fca5a5;}
+
+.note{font-size:12px;color:rgba(255,255,255,.4);line-height:1.7;margin-top:8px;}
+
+footer{padding:48px;text-align:center;border-top:1px solid rgba(255,255,255,.08);}
+.footer-text{font-family:'DM Mono',monospace;font-size:11px;color:rgba(255,255,255,.4);margin-top:16px;}
+</style>
+</head>
+<body>
+
+<nav>
+  <a href="index.html"><img src="logo-white-cropped.png" alt="Zyloq" style="height:36px;"></a>
+  <ul class="nav-links">
+    <li><a href="index.html#problema">Problema</a></li>
+    <li><a href="como-funciona.html">Como funciona</a></li>
+    <li><a href="dashboard.html">Dashboard</a></li>
+  </ul>
+</nav>
+
+<div class="wrap">
+  <div class="glow"></div>
+  <div class="container">
+    <div class="label">Acesso à Plataforma</div>
+    <h1 class="title">Solicite acesso ao Zyloq</h1>
+    <p class="sub">Farmacêutico hospitalar, gestor de hospital ou representante de plano de saúde: preencha os dados abaixo. Nossa equipe analisa cada pedido e libera o acesso — não é uma conta automática.</p>
+
+    <form id="form-cadastro">
+      <div>
+        <label for="tipo_solicitante">Você é</label>
+        <select id="tipo_solicitante" required>
+          <option value="">Selecione</option>
+          <option value="farmaceutico">Farmacêutico(a) Hospitalar</option>
+          <option value="hospital">Gestor(a) / Diretor(a) Hospitalar</option>
+          <option value="plano_saude">Representante de Plano de Saúde</option>
+          <option value="outro">Outro</option>
+        </select>
+      </div>
+
+      <div class="row">
+        <div>
+          <label for="nome">Nome completo</label>
+          <input type="text" id="nome" placeholder="Seu nome" required>
+        </div>
+        <div>
+          <label for="cargo">Cargo</label>
+          <input type="text" id="cargo" placeholder="Ex: Farmacêutico Chefe">
+        </div>
+      </div>
+
+      <div class="row">
+        <div>
+          <label for="email">E-mail profissional</label>
+          <input type="email" id="email" placeholder="voce@instituicao.com.br" required>
+        </div>
+        <div>
+          <label for="telefone">Telefone / WhatsApp</label>
+          <input type="tel" id="telefone" placeholder="(00) 00000-0000">
+        </div>
+      </div>
+
+      <div class="row">
+        <div>
+          <label for="instituicao">Instituição</label>
+          <input type="text" id="instituicao" placeholder="Nome do hospital ou plano de saúde" required>
+        </div>
+        <div>
+          <label for="cnpj">CNPJ (opcional)</label>
+          <input type="text" id="cnpj" placeholder="00.000.000/0001-00">
+        </div>
+      </div>
+
+      <div>
+        <label for="mensagem">Conte um pouco sobre sua necessidade (opcional)</label>
+        <textarea id="mensagem" placeholder="Ex: temos interesse em ser um Design Partner, atualmente usamos planilha para controle de descarte..."></textarea>
+      </div>
+
+      <button type="submit" class="btn-submit" id="btn-submit">Enviar Solicitação</button>
+      <div class="msg success" id="msg-success">Solicitação enviada! Nossa equipe entrará em contato em breve pelo e-mail informado.</div>
+      <div class="msg error" id="msg-error">Não foi possível enviar agora. Tente novamente ou fale conosco pelo WhatsApp.</div>
+
+      <p class="note">Seus dados são usados apenas para avaliação do pedido de acesso e contato comercial — não criamos nenhuma conta automaticamente a partir deste formulário.</p>
+    </form>
+  </div>
+</div>
+
+<footer>
+  <img src="logo-white-cropped.png" alt="Zyloq" style="height:28px;opacity:.6;">
+  <div class="footer-text">contato@zyloq.com.br · +55 81 99304-0072 · Recife, PE · CNPJ 67.148.559/0001-34</div>
+</footer>
+
+<script>
+const SUPA_URL = 'https://ykxjosonuidgjsevpljx.supabase.co';
+const SUPA_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InlreGpvc29udWlkZ2pzZXZwbGp4Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzk3NDQwNDcsImV4cCI6MjA5NTMyMDA0N30.kqOV4ZguC99ZW6Aa0c0m9ofuW7pWFV8tVSNK7CEha3Q';
+
+document.getElementById('form-cadastro').addEventListener('submit', async (e) => {
+  e.preventDefault();
+  const btn = document.getElementById('btn-submit');
+  const msgSuccess = document.getElementById('msg-success');
+  const msgError = document.getElementById('msg-error');
+  msgSuccess.style.display = 'none';
+  msgError.style.display = 'none';
+  btn.disabled = true;
+  btn.textContent = 'Enviando...';
+
+  const payload = {
+    tipo_solicitante: document.getElementById('tipo_solicitante').value,
+    nome: document.getElementById('nome').value.trim(),
+    cargo: document.getElementById('cargo').value.trim() || null,
+    email: document.getElementById('email').value.trim(),
+    telefone: document.getElementById('telefone').value.trim() || null,
+    instituicao: document.getElementById('instituicao').value.trim(),
+    cnpj: document.getElementById('cnpj').value.trim() || null,
+    mensagem: document.getElementById('mensagem').value.trim() || null,
+  };
+
+  try {
+    const res = await fetch(`${SUPA_URL}/rest/v1/solicitacoes_cadastro`, {
+      method: 'POST',
+      headers: {
+        'apikey': SUPA_KEY,
+        'Authorization': 'Bearer ' + SUPA_KEY,
+        'Content-Type': 'application/json',
+        'Prefer': 'return=minimal',
+      },
+      body: JSON.stringify(payload),
+    });
+
+    if (!res.ok) throw new Error('Falha no envio');
+
+    msgSuccess.style.display = 'block';
+    e.target.reset();
+  } catch (err) {
+    msgError.style.display = 'block';
+  } finally {
+    btn.disabled = false;
+    btn.textContent = 'Enviar Solicitação';
+  }
+});
+</script>
+
+</body>
+</html>
