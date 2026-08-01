@@ -119,8 +119,8 @@ footer{padding:48px;text-align:center;border-top:1px solid rgba(255,255,255,.08)
       </div>
 
       <button type="submit" class="btn-submit" id="btn-submit">Enviar Solicitação</button>
-      <div class="msg success" id="msg-success">Solicitação enviada! Nossa equipe entrará em contato em breve pelo e-mail informado.</div>
-      <div class="msg error" id="msg-error">Não foi possível enviar agora. Tente novamente ou fale conosco pelo WhatsApp.</div>
+      <div class="msg" id="msg-success">Solicitação enviada! Nossa equipe entrará em contato em breve pelo e-mail informado.</div>
+      <div class="msg" id="msg-error">Não foi possível enviar agora. Tente novamente ou fale conosco pelo WhatsApp.</div>
 
       <p class="note">Seus dados são usados apenas para avaliação do pedido de acesso e contato comercial — não criamos nenhuma conta automaticamente a partir deste formulário.</p>
     </form>
@@ -141,8 +141,8 @@ document.getElementById('form-cadastro').addEventListener('submit', async (e) =>
   const btn = document.getElementById('btn-submit');
   const msgSuccess = document.getElementById('msg-success');
   const msgError = document.getElementById('msg-error');
-  msgSuccess.style.display = 'none';
-  msgError.style.display = 'none';
+  msgSuccess.classList.remove('success');
+  msgError.classList.remove('error');
   btn.disabled = true;
   btn.textContent = 'Enviando...';
 
@@ -171,10 +171,10 @@ document.getElementById('form-cadastro').addEventListener('submit', async (e) =>
 
     if (!res.ok) throw new Error('Falha no envio');
 
-    msgSuccess.style.display = 'block';
+    msgSuccess.classList.add('success');
     e.target.reset();
   } catch (err) {
-    msgError.style.display = 'block';
+    msgError.classList.add('error');
   } finally {
     btn.disabled = false;
     btn.textContent = 'Enviar Solicitação';
