@@ -328,29 +328,29 @@ footer{background:var(--black);padding:36px 48px;border-top:1px solid rgba(255,2
         <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:16px;">
           <div style="background:rgba(220,38,38,.1);border:1px solid rgba(220,38,38,.2);padding:14px;">
             <div style="font-size:10px;color:rgba(255,255,255,.4);letter-spacing:.1em;text-transform:uppercase;font-family:'DM Mono',monospace;margin-bottom:6px;">Valor Desperdiçado</div>
-            <div style="font-size:22px;font-weight:800;color:#DC2626;">R$ 245k</div>
+            <div id="live-valor" style="font-size:22px;font-weight:800;color:#DC2626;">—</div>
           </div>
           <div style="background:rgba(0,106,252,.1);border:1px solid rgba(0,106,252,.2);padding:14px;">
             <div style="font-size:10px;color:rgba(255,255,255,.4);letter-spacing:.1em;text-transform:uppercase;font-family:'DM Mono',monospace;margin-bottom:6px;">Certificados</div>
-            <div style="font-size:22px;font-weight:800;color:#fff;">11</div>
+            <div id="live-certificados" style="font-size:22px;font-weight:800;color:#fff;">—</div>
           </div>
           <div style="background:rgba(22,163,74,.1);border:1px solid rgba(22,163,74,.2);padding:14px;">
             <div style="font-size:10px;color:rgba(255,255,255,.4);letter-spacing:.1em;text-transform:uppercase;font-family:'DM Mono',monospace;margin-bottom:6px;">Hospitais Ativos</div>
-            <div style="font-size:22px;font-weight:800;color:#16A34A;">3</div>
+            <div id="live-hospitais" style="font-size:22px;font-weight:800;color:#16A34A;">—</div>
           </div>
           <div style="background:rgba(217,119,6,.1);border:1px solid rgba(217,119,6,.2);padding:14px;">
             <div style="font-size:10px;color:rgba(255,255,255,.4);letter-spacing:.1em;text-transform:uppercase;font-family:'DM Mono',monospace;margin-bottom:6px;">Medicamentos</div>
-            <div style="font-size:22px;font-weight:800;color:#D97706;">10</div>
+            <div id="live-medicamentos" style="font-size:22px;font-weight:800;color:#D97706;">—</div>
           </div>
         </div>
         <!-- MTR bar -->
         <div style="background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.08);padding:14px;">
           <div style="display:flex;justify-content:space-between;margin-bottom:8px;">
             <span style="font-size:10px;color:rgba(255,255,255,.4);font-family:'DM Mono',monospace;text-transform:uppercase;letter-spacing:.1em;">Compliance MTR SINIR</span>
-            <span style="font-size:12px;font-weight:700;color:#16A34A;">80%</span>
+            <span id="live-mtr-pct" style="font-size:12px;font-weight:700;color:#16A34A;">—</span>
           </div>
           <div style="height:6px;background:rgba(255,255,255,.1);border-radius:3px;">
-            <div style="width:80%;height:100%;background:#16A34A;border-radius:3px;"></div>
+            <div id="live-mtr-bar" style="width:0%;height:100%;background:#16A34A;border-radius:3px;transition:width .6s ease;"></div>
           </div>
         </div>
         <div style="position:absolute;top:12px;right:12px;width:8px;height:8px;background:#16A34A;border-radius:50%;animation:pulse 2s infinite;"></div>
@@ -359,6 +359,38 @@ footer{background:var(--black);padding:36px 48px;border-top:1px solid rgba(255,2
     </div>
   </div>
 </section>
+
+<script>
+(function() {
+  const SUPA_URL = 'https://ykxjosonuidgjsevpljx.supabase.co';
+  const SUPA_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InlreGpvc29udWlkZ2pzZXZwbGp4Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzk3NDQwNDcsImV4cCI6MjA5NTMyMDA0N30.kqOV4ZguC99ZW6Aa0c0m9ofuW7pWFV8tVSNK7CEha3Q';
+  const headers = { apikey: SUPA_KEY, Authorization: 'Bearer ' + SUPA_KEY };
+
+  Promise.all([
+    fetch(`${SUPA_URL}/rest/v1/registros?select=valor_desperdicado,status,numero_mtr,hospital_id`, { headers }).then(r => r.json()),
+    fetch(`${SUPA_URL}/rest/v1/medicamentos?select=id`, { headers }).then(r => r.json()),
+  ]).then(([registros, medicamentos]) => {
+    const valorTotal = registros.reduce((sum, r) => sum + Number(r.valor_desperdicado || 0), 0);
+    const certificados = registros.filter(r => r.status === 'incinerado').length;
+    const hospitaisAtivos = new Set(registros.map(r => r.hospital_id)).size;
+    const incinerados = registros.filter(r => r.status === 'incinerado');
+    const mtrPct = incinerados.length ? Math.round((incinerados.filter(r => r.numero_mtr).length / incinerados.length) * 100) : 0;
+
+    const fmt = (v) => v >= 1000 ? `R$ ${(v / 1000).toFixed(0)}k` : `R$ ${v.toFixed(0)}`;
+
+    document.getElementById('live-valor').textContent = fmt(valorTotal);
+    document.getElementById('live-certificados').textContent = certificados;
+    document.getElementById('live-hospitais').textContent = hospitaisAtivos;
+    document.getElementById('live-medicamentos').textContent = medicamentos.length;
+    document.getElementById('live-mtr-pct').textContent = mtrPct + '%';
+    document.getElementById('live-mtr-bar').style.width = mtrPct + '%';
+  }).catch(() => {
+    ['live-valor','live-certificados','live-hospitais','live-medicamentos','live-mtr-pct'].forEach(id => {
+      document.getElementById(id).textContent = 'n/d';
+    });
+  });
+})();
+</script>
 
 <section class="cta-section">
   <h2 class="cta-title">ZERO LOSS.<br><span class="blue">FULL CYCLE.</span></h2>
